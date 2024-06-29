@@ -17,13 +17,6 @@ ReactDOM.render(<App />, document.getElementById("root"));
 `;
 
 const styles = {
-  container: {
-    position: "relative",
-    textAlign: "left",
-    boxSizing: "border-box",
-    padding: 0,
-    overflow: "hidden",
-  },
   textarea: {
     position: "absolute",
     top: 0,
@@ -37,10 +30,6 @@ const styles = {
     MozOsxFontSmoothing: "grayscale",
     WebkitFontSmoothing: "antialiased",
     WebkitTextFillColor: "transparent",
-  },
-  highlight: {
-    position: "relative",
-    pointerEvents: "none",
   },
   editor: {
     margin: 0,
