@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import useEditor from "../hooks/useEditor";
 import { cn } from "../utils/cn";
 import dedent from "dedent";
 
-const codeBlock = dedent`
+export const codeBlock = dedent`
 import React from "react";
 import ReactDOM from "react-dom";
 
@@ -64,40 +64,72 @@ const styles = {
   },
 } as const;
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {
+interface Props extends React.HTMLProps<HTMLTextAreaElement> {
+  wrapperClassName?: string;
+  wrapperStyles?: React.CSSProperties;
+  lineNumbersDivClassName?: string;
+  lineNumbersDivStyles?: React.CSSProperties;
+  containerClassName?: string;
+  containerStyles?: React.CSSProperties;
   preClassName?: string;
   preStyles?: React.CSSProperties;
-  textareaClassName?: string;
-  textareaStyles?: React.CSSProperties;
+  setValue?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function Editor({
   className,
+  style,
+  wrapperClassName,
+  wrapperStyles,
+  lineNumbersDivClassName,
+  lineNumbersDivStyles,
+  containerClassName,
+  containerStyles,
   preClassName,
   preStyles,
-  textareaClassName,
-  textareaStyles,
+  onChange,
+  onKeyDown,
+  onClick,
+  value,
+  setValue,
   ...rest
 }: Props) {
-  const [code, setcode] = useState(codeBlock);
-  const { highlighted, textareaRef, handleChange, handleClick, handleKeyDown } =
-    useEditor({ controlledCode: code, controlledSetCode: setcode });
+  const {
+    highlighted,
+    textareaRef,
+    handleChange,
+    handleClick,
+    handleKeyDown,
+    code,
+  } = useEditor({
+    ...(value !== undefined &&
+      setValue !== undefined &&
+      typeof value === "string" && {
+        controlledCode: value,
+        controlledSetCode: setValue,
+      }),
+  });
   return (
-    <div className={cn("flex relative w-full", className)} {...rest}>
+    <div
+      className={cn("flex relative w-full", wrapperClassName)}
+      style={wrapperStyles}
+    >
       <div
-        className="line-numbers text-right p-[10px] select-none"
+        className={cn("text-right p-3 select-none", lineNumbersDivClassName)}
+        style={lineNumbersDivStyles}
         aria-hidden="true"
       >
         <LineNumbers code={code} />
       </div>
-      <div style={{ ...styles.container }}>
+      <div
+        className={cn("relative", containerClassName)}
+        style={containerStyles}
+      >
         <pre
-          className={preClassName}
+          className={cn("relative pointer-events-none p-3", preClassName)}
           aria-hidden="true"
           style={{
             ...styles.editor,
-            ...styles.highlight,
-            padding: "10px",
             ...preStyles,
           }}
           {...(typeof highlighted === "string"
@@ -106,21 +138,30 @@ export default function Editor({
         />
         <textarea
           ref={textareaRef}
-          className={textareaClassName}
+          className={cn("p-3", className)}
           style={{
             ...styles.editor,
             ...styles.textarea,
-            padding: "10px",
-            ...textareaStyles,
+            ...style,
           }}
           value={code}
-          onClick={handleClick}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
+          onClick={(e) => {
+            handleClick(e);
+            onClick && onClick(e);
+          }}
+          onChange={(e) => {
+            handleChange(e);
+            onChange && onChange(e);
+          }}
+          onKeyDown={(e) => {
+            handleKeyDown(e);
+            onKeyDown && onKeyDown(e);
+          }}
           autoCapitalize="off"
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
+          {...rest}
         />
       </div>
     </div>
