@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import useEditor from "../hooks/useEditor";
 import { cn } from "../utils/cn";
 import dedent from "dedent";
@@ -28,11 +28,12 @@ const styles = {
     position: "absolute",
     top: 0,
     left: 0,
+    border: '1px solid black',
     height: "100%",
     width: "100%",
     resize: "none",
     color: "inherit",
-    overflow: "hidden",
+    overflow: "scroll",
     MozOsxFontSmoothing: "grayscale",
     WebkitFontSmoothing: "antialiased",
     WebkitTextFillColor: "transparent",
@@ -109,24 +110,39 @@ export default function Editor({
         controlledSetCode: setValue,
       }),
   });
+  const lineNumberRef = useRef<HTMLDivElement>(null);
+
+  function handleScroll() {
+    if (textareaRef.current && lineNumberRef.current) {
+      lineNumberRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  }
+
   return (
     <div
-      className={cn("flex relative w-full", wrapperClassName)}
+      className={cn("flex relative w-[600px] h-[400px] overflow-y-hidden", wrapperClassName)}
       style={wrapperStyles}
     >
       <div
-        className={cn("text-right p-3 select-none", lineNumbersDivClassName)}
+        className={cn(
+          "text-right p-3 select-none overflow-y-scroll scrollbar-hide",
+          lineNumbersDivClassName
+        )}
         style={lineNumbersDivStyles}
+        ref={lineNumberRef}
         aria-hidden="true"
       >
         <LineNumbers code={code} />
       </div>
       <div
-        className={cn("relative", containerClassName)}
+        className={cn("relative w-full", containerClassName)}
         style={containerStyles}
       >
         <pre
-          className={cn("relative pointer-events-none p-3", preClassName)}
+          className={cn(
+            "relative pointer-events-none p-3 w-full",
+            preClassName
+          )}
           aria-hidden="true"
           style={{
             ...styles.editor,
@@ -138,7 +154,7 @@ export default function Editor({
         />
         <textarea
           ref={textareaRef}
-          className={cn("p-3", className)}
+          className={cn("p-3 w-full", className)}
           style={{
             ...styles.editor,
             ...styles.textarea,
@@ -157,6 +173,7 @@ export default function Editor({
             handleKeyDown(e);
             onKeyDown && onKeyDown(e);
           }}
+          onScroll={handleScroll}
           autoCapitalize="off"
           autoComplete="off"
           autoCorrect="off"
