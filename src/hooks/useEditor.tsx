@@ -183,10 +183,18 @@ export default function useEditor({
       e.key === "ArrowDown" &&
       start === end
     ) {
-      const line = value.substring(0, start).split("\n").pop();
+      const lineStart = value.substring(0, start).split("\n").pop();
+      const lineEndArray = value.substring(end).split("\n");
+      let lineEnd = lineEndArray.shift() ?? "";
+      const line = lineStart + lineEnd;
       if (line) {
         updatedCode =
-          value.substring(0, start) + "\n" + line + value.substring(end);
+          value.substring(0, start) +
+          lineEnd +
+          "\n" +
+          line +
+          "\n" +
+          lineEndArray.join("\n");
         updatedStart = start + line.length + 1;
         updatedEnd = start + line.length + 1;
       }
