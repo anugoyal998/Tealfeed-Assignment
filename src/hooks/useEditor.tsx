@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import dedent from "dedent";
 import { highlight, languages } from "prismjs";
-import "prismjs/themes/prism.css";
+import "prismjs/themes/prism.min.css";
 
 const codeBlock = dedent`
 import React from "react";

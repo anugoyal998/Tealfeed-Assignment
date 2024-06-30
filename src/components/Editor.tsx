@@ -1,32 +1,17 @@
-import React, { useRef } from "react";
 import useEditor from "../hooks/useEditor";
 import { cn } from "../utils/cn";
-import dedent from "dedent";
-
-export const codeBlock = dedent`
-import React from "react";
-import ReactDOM from "react-dom";
-
-function App() {
-    return (
-        <h1>Hello world</h1>
-    );
-}
-
-ReactDOM.render(<App />, document.getElementById("root"));
-`;
 
 const styles = {
   textarea: {
     position: "absolute",
     top: 0,
     left: 0,
-    border: '1px solid black',
     height: "100%",
     width: "100%",
     resize: "none",
     color: "inherit",
-    overflow: "scroll",
+    overflow: "hidden",
+    border: "1px solid black",
     MozOsxFontSmoothing: "grayscale",
     WebkitFontSmoothing: "antialiased",
     WebkitTextFillColor: "transparent",
@@ -34,6 +19,7 @@ const styles = {
   editor: {
     margin: 0,
     border: 0,
+    padding: "0.75rem",
     background: "none",
     boxSizing: "inherit",
     display: "inherit",
@@ -66,7 +52,7 @@ interface Props extends React.HTMLProps<HTMLTextAreaElement> {
   setValue?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Editor({
+export default function Test({
   className,
   style,
   wrapperClassName,
@@ -99,57 +85,40 @@ export default function Editor({
         controlledSetCode: setValue,
       }),
   });
-  const lineNumberRef = useRef<HTMLDivElement>(null);
-
-  function handleScroll() {
-    if (textareaRef.current && lineNumberRef.current) {
-      lineNumberRef.current.scrollTop = textareaRef.current.scrollTop;
-    }
-  }
-
   return (
-    <div
-      className={cn("flex relative w-[600px] h-[400px] overflow-y-hidden", wrapperClassName)}
-      style={wrapperStyles}
-    >
+    <div className={cn("flex gap-2", wrapperClassName)} style={wrapperStyles}>
       <div
         className={cn(
           "text-right p-3 select-none overflow-y-scroll scrollbar-hide",
-          lineNumbersDivClassName
+          preClassName
         )}
-        style={lineNumbersDivStyles}
-        ref={lineNumberRef}
         aria-hidden="true"
+        style={preStyles}
       >
         <LineNumbers code={code} />
       </div>
       <div
-        className={cn("relative w-full", containerClassName)}
+        className={cn(
+          "w-full h-full relative overflow-hidden text-left",
+          containerClassName
+        )}
         style={containerStyles}
       >
         <pre
-          className={cn(
-            "relative pointer-events-none p-3 w-full",
-            preClassName
-          )}
+          className={cn("relative pointer-events-none", preClassName)}
+          style={{ ...styles.editor, ...preStyles }}
           aria-hidden="true"
-          style={{
-            ...styles.editor,
-            ...preStyles,
-          }}
-          {...(typeof highlighted === "string"
-            ? { dangerouslySetInnerHTML: { __html: highlighted + "<br />" } }
-            : { children: highlighted })}
+          dangerouslySetInnerHTML={{ __html: highlighted + "<br/>" }}
         />
         <textarea
           ref={textareaRef}
-          className={cn("p-3 w-full", className)}
+          className={cn(className)}
+          value={code}
           style={{
             ...styles.editor,
             ...styles.textarea,
             ...style,
           }}
-          value={code}
           onClick={(e) => {
             handleClick(e);
             onClick && onClick(e);
@@ -162,7 +131,6 @@ export default function Editor({
             handleKeyDown(e);
             onKeyDown && onKeyDown(e);
           }}
-          onScroll={handleScroll}
           autoCapitalize="off"
           autoComplete="off"
           autoCorrect="off"

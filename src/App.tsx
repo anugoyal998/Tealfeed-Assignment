@@ -1,24 +1,40 @@
 import { useState } from "react";
-import Editor, { codeBlock } from "./components/Editor";
+import Editor from "./components/Editor";
+import dedent from "dedent";
+
+const codeBlock = dedent`
+import React from "react";
+import ReactDOM from "react-dom";
+
+function App() {
+    return (
+        <h1>Hello world</h1>
+    );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+`;
 
 export default function App() {
   const [code, setcode] = useState(codeBlock);
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
-      <div className="flex flex-col items-center gap-3">
-        <p className="text-center font-semibold text-xl">
-          Tealfeed Assignment - Code Editor
-        </p>
-        <a
-          className="bg-teal-500 text-white px-3 py-2 rounded-md hover:bg-teal-600"
-          href="https://github.com/anugoyal998/tealfeed-assignment"
-        >
-          Github
-        </a>
-        {/* Controlled Editor */}
-        <Editor value={code} setValue={setcode} className="" />
-        {/* UnControlled Editor */}
-        {/* <Editor /> */}
+    <div className="flex justify-center items-center h-screen w-full">
+      <div className="w-[600px] text-center flex flex-col gap-3">
+        <p className="">Tealfeed Assignment - Code Editor</p>
+        <div>
+          <a
+            className="bg-teal-500 text-white px-3 py-2 rounded-md hover:bg-teal-600"
+            href="https://github.com/anugoyal998/tealfeed-assignment"
+          >
+            Github
+          </a>
+        </div>
+        <div className="h-[400px] overflow-auto">
+          {/* Controlled Editor */}
+          <Editor value={code} setValue={setcode} />
+          {/* UnControlled Editor */}
+          {/* <Editor /> */}
+        </div>
       </div>
     </div>
   );
