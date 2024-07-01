@@ -32,11 +32,7 @@ export default function useEditor({
     { code: codeBlock, start: 0, end: 0 },
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const highlighted = highlight(
-    getCodeState().codeState,
-    languages.javascript,
-    "javascript"
-  );
+  const highlighted = highlight(getCodeState().codeState, languages.tsx, "tsx");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   function getCodeState() {
@@ -109,18 +105,17 @@ export default function useEditor({
     let updatedEnd;
     // handle Tab insert
     if (e.key === "Tab") {
-      e.preventDefault();
       const emptyChar = " ".repeat(TAB_SIZE);
+      const selected = value.substring(start, end).split("\n").map((line) => `${emptyChar}${line}`).join("\n");
       updatedCode =
-        value.substring(0, start) + emptyChar + value.substring(end);
+        value.substring(0, start) + selected + value.substring(end);
       updatedStart = start + TAB_SIZE;
-      updatedEnd = start + TAB_SIZE;
+      updatedEnd = start + selected.length;
     } else if (e.key === "Enter") {
       if (start === end) {
         const line = value.substring(0, start).split("\n").pop();
         const matches = line?.match(/^\s+/);
         if (matches?.[0]) {
-          e.preventDefault();
           const indent = "\n" + matches[0];
           const updatedSelection = start + indent.length;
           updatedCode =
@@ -153,7 +148,6 @@ export default function useEditor({
       }
       const hasSelection = start !== end;
       if (chars) {
-        e.preventDefault();
         if (hasSelection) {
           updatedCode =
             value.substring(0, start) +
@@ -173,7 +167,6 @@ export default function useEditor({
         }
       }
     } else if ((e.metaKey || e.ctrlKey) && e.key === "z") {
-      e.preventDefault();
       undo();
     } else if ((e.metaKey || e.ctrlKey) && e.key === "y") {
       redo();
@@ -203,6 +196,7 @@ export default function useEditor({
       updateHistory(updatedCode, updatedStart, updatedEnd);
       updateCode(updatedCode);
       setSelection(updatedStart, updatedEnd);
+      e.preventDefault();
     }
   }
 
