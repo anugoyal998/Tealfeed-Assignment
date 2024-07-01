@@ -1,20 +1,6 @@
 import { useRef, useState } from "react";
-import dedent from "dedent";
 import { highlight, languages } from "prismjs";
 import "prismjs/themes/prism.min.css";
-
-const codeBlock = dedent`
-import React from "react";
-import ReactDOM from "react-dom";
-
-function App() {
-    return (
-        <h1>Hello world</h1>
-    );
-}
-
-ReactDOM.render(<App />, document.getElementById("root"));
-`;
 
 interface Props {
   TAB_SIZE?: number;
@@ -27,9 +13,9 @@ export default function useEditor({
   controlledCode,
   controlledSetCode,
 }: Props) {
-  const [code, setcode] = useState(codeBlock);
+  const [code, setcode] = useState(controlledCode ?? "");
   const [history, setHistory] = useState([
-    { code: codeBlock, start: 0, end: 0 },
+    { code: controlledCode ?? "", start: 0, end: 0 },
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const highlighted = highlight(getCodeState().codeState, languages.tsx, "tsx");
@@ -168,8 +154,10 @@ export default function useEditor({
       }
     } else if ((e.metaKey || e.ctrlKey) && e.key === "z") {
       undo();
+      e.preventDefault();
     } else if ((e.metaKey || e.ctrlKey) && e.key === "y") {
       redo();
+      e.preventDefault();
     } else if (
       e.shiftKey &&
       e.altKey &&

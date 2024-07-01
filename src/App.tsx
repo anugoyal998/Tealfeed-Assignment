@@ -3,16 +3,19 @@ import Editor from "./components/Editor";
 import dedent from "dedent";
 
 const codeBlock = dedent`
-import React from "react";
-import ReactDOM from "react-dom";
+import React from "react"
 
-function App() {
+interface Props {}
+
+const App = () => {
     return (
-        <h1>Hello world</h1>
-    );
+        <div>
+            <h1>Hello World!!</h1>
+        </div>
+    )
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+export default App;
 `;
 
 export default function App() {
